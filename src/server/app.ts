@@ -27,7 +27,7 @@ app.use(expressValidator());
 // Handle Routing
 app.use(router);
 
-// Error Handling
+// System Error Handling
 app.use(
     (
         error: { message: String },

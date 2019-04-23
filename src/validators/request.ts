@@ -21,5 +21,21 @@ export const validate = (method: string) => {
                     .isNumeric(),
             ];
         }
+        case "updateProduct": {
+            return [
+                body("product_name", "You must specify the product's name")
+                    .optional()
+                    .isString(),
+                body("product_price", "You must specify the product's price")
+                    .optional()
+                    .isNumeric(),
+                body(
+                    "product_quantity",
+                    "You must specify the product's quantity",
+                )
+                    .optional()
+                    .isNumeric(),
+            ];
+        }
     }
 };
