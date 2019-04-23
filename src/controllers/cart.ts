@@ -12,7 +12,7 @@ let decrementProductQuantity: (
 ) => (productId: number, orderQuantity: number) => void;
 
 export const getAll = (req: Request, res: Response, next: NextFunction) => {
-    res.status(200).send(cart.products);
+    res.status(200).send({ products: cart.products, total: cart.total });
 };
 
 export const create = (req: Request, res: Response, next: NextFunction) => {

@@ -65,13 +65,20 @@ class Cart {
         const productIndex = this._getProductIndex(productId);
 
         // Check if the product exists
+        // If it doesn't exist
+        if (productIndex === -1) {
+            return {};
+        }
+
         // If so,
         // Remove the product from the cart
-        // and return the deleted product
-        // Otherwise, return empty object
-        return productIndex === -1
-            ? {}
-            : this._products.splice(productIndex, 1);
+        const removedProduct = this._products.splice(productIndex, 1);
+
+        // Recalculate cart's total
+        this._calculateTotal();
+
+        // Return the deleted product
+        return removedProduct;
     };
 
     private _calculateTotal = () => {
