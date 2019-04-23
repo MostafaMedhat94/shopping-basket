@@ -37,11 +37,21 @@ export const validate = (method: string) => {
                     .isNumeric(),
             ];
         }
-        case "addProductToCart": {
+        case "addProductToShoppingCart": {
             return [
                 body("product_id", "You must specify the product's ID")
                     .exists()
                     .isInt(),
+                body(
+                    "product_quantity",
+                    "You must specify the product's quantity",
+                )
+                    .exists()
+                    .isNumeric(),
+            ];
+        }
+        case "updateShoppingCartProductQuantity": {
+            return [
                 body(
                     "product_quantity",
                     "You must specify the product's quantity",

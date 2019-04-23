@@ -37,6 +37,19 @@ class Cart {
         return this._products;
     };
 
+    public getProduct = (productId: number): {} | IProduct => {
+        const productIndex = this._getProductIndex(productId);
+
+        // Check if the product is in the shopping list
+        if (productIndex === -1) {
+            // If, not ...
+            return null;
+        }
+
+        // Return the product
+        return this._products[productIndex];
+    };
+
     public updateProduct = (
         productId: number,
         update: {
@@ -50,7 +63,7 @@ class Cart {
         // Check if the product is in the shopping list
         if (productIndex === -1) {
             // If, not ...
-            return {};
+            return null;
         }
 
         // If so, update the product's attributes
@@ -75,6 +88,28 @@ class Cart {
         return this._products[productIndex];
     };
 
+    public updateProductQuantity = (
+        productId: number,
+        productQuantity: number,
+    ) => {
+        const productIndex = this._getProductIndex(productId);
+
+        // Check if the product is in the shopping list
+        if (productIndex === -1) {
+            // If, not ...
+            return null;
+        }
+
+        // Update product quantity
+        this._products[productIndex].product_quantity = productQuantity;
+
+        // Calculate the shopping list's total
+        this._calculateTotal();
+
+        // Return the updated product
+        return this._products[productIndex];
+    };
+
     public deleteProduct = (productId: number) => {
         // Get product index
         const productIndex = this._getProductIndex(productId);
@@ -82,7 +117,7 @@ class Cart {
         // Check if the product exists
         // If it doesn't exist
         if (productIndex === -1) {
-            return {};
+            return null;
         }
 
         // If so,

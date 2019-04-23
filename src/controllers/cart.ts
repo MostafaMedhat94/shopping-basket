@@ -16,7 +16,7 @@ export const getAll = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const create = (req: Request, res: Response, next: NextFunction) => {
-    // Get errors from the previous validation function
+    // Get errors from the previous middleware validation function
     const errors = validationResult(req);
 
     // If there are any errors
@@ -50,7 +50,7 @@ export const create = (req: Request, res: Response, next: NextFunction) => {
         // Otherwise, get the product
         const product: IProduct = storedProduct.toObject(); // convert product's document to plain JS object
 
-        // Check if the product is in stock
+        // Check if the product is out of stock
         if (product.product_quantity === 0) {
             return res.status(400).send({
                 message: "Unfortunately, your product is out of stock!",
@@ -72,9 +72,110 @@ export const create = (req: Request, res: Response, next: NextFunction) => {
         cart.addProduct(product);
 
         // Decrement product's available quantity in the productsList
-        decrementProductQuantity(next)(product.product_id, orderQuantity);
+        decrementProductQuantity(next)(product.product_id, -orderQuantity);
 
-        return res.status(201).send(cart.products);
+        // Return the shopping cart
+        return res
+            .status(201)
+            .send({ products: cart.products, total: cart.total });
+    });
+};
+
+export const getOne = (req: Request, res: Response, next: NextFunction) => {
+    // Get the product ID
+    const productId = req.params.id;
+
+    // Get the product (if found)
+    const cartProduct = cart.getProduct(productId);
+
+    // DEBUGGER
+    console.log(cartProduct);
+    // If the product is not found in the shopping cart
+    if (!cartProduct) {
+        return res
+            .status(422)
+            .send({ message: "The product is not in your shopping cart!" });
+    }
+
+    // Otherwise, return the product
+    return res.status(200).send(cartProduct);
+};
+
+export const updateQuantity = (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
+    // Get errors from the previous middleware validation function
+    const errors = validationResult(req);
+
+    // If there are any errors
+    if (!errors.isEmpty()) {
+        // Send them back and return
+        return res.status(422).send({
+            errors: errors
+                .array()
+                .map((error: { param: string; msg: string }) => `${error.msg}.`)
+                .join(" "),
+        });
+    }
+
+    // Get the product ID
+    const productId = req.params.id;
+
+    // Get the product (if found)
+    const cartProduct = cart.getProduct(productId);
+
+    // If the product is not found in the shopping cart
+    if (!cartProduct) {
+        return res
+            .status(422)
+            .send({ message: "The product is not in your shopping cart!" });
+    }
+
+    // Get the product's update quantity
+    const { product_quantity: updateQuantity } = req.body;
+
+    // Get the product from the productsList
+    Product.findOne({ product_id: productId }, (err, storedProduct) => {
+        if (err) {
+            return next(err);
+        }
+
+        // Convert product's document to plain JS object
+        const {
+            product_quantity: storedProductQuantity, // Get the stored product's quantity
+            product_name, // Get the stored product name
+        } = storedProduct.toObject();
+
+        // Check if the product is out of stock
+        if (storedProductQuantity === 0) {
+            return res.status(422).send({
+                message: "Unfortunately, your product is out of stock!",
+            });
+        }
+        // Check if there's enough quantity to serve the order
+        else if (storedProductQuantity < updateQuantity) {
+            return res.status(422).send({
+                message: `There is only ${storedProductQuantity} left of ${product_name}`,
+            });
+        }
+
+        // Calculate the difference between the cartProduct's quantity
+        // and the update quantity
+        const quantityDifference =
+            cartProduct["product_quantity"] - updateQuantity;
+
+        // Update the shopping cart's product quantity
+        cart.updateProductQuantity(productId, updateQuantity);
+
+        // Decrement product's available quantity in the productsList
+        decrementProductQuantity(next)(productId, quantityDifference);
+
+        // Return the shopping cart
+        return res
+            .status(202)
+            .send({ products: cart.products, total: cart.total });
     });
 };
 
@@ -91,7 +192,7 @@ decrementProductQuantity = (next: NextFunction) => (
 ) => {
     Product.findOneAndUpdate(
         { product_id: productId },
-        { $inc: { product_quantity: -orderQuantity } },
+        { $inc: { product_quantity: orderQuantity } },
         (err, storedProduct) => {
             if (err) {
                 return next(err);
