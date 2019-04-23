@@ -23,18 +23,12 @@ class Cart {
         // Check if the product was previously added to the shopping cart
         if (productIndex !== -1) {
             // If so, update the product quantity
-            this._products[productIndex].product_quantity =
+            this._products[productIndex].product_quantity +=
                 product.product_quantity;
         } else {
             // Otherwise, add the product to the shopping list
             this._products.push(product);
         }
-
-        // Decrement the available amount of the product
-        // productsList.decrementProductQuantity(
-        //     product.product_id,
-        //     product.product_quantity,
-        // );
 
         // Calculate the shopping list's total
         this._calculateTotal();
@@ -66,6 +60,20 @@ class Cart {
         });
     };
 
+    public deleteProduct = (productId: number) => {
+        // Get product index
+        const productIndex = this._getProductIndex(productId);
+
+        // Check if the product exists
+        // If so,
+        // Remove the product from the cart
+        // and return the deleted product
+        // Otherwise, return empty object
+        return productIndex === -1
+            ? {}
+            : this._products.splice(productIndex, 1);
+    };
+
     private _calculateTotal = () => {
         this._total = this._products
             .map((product) => product.product_price * product.product_quantity)
@@ -83,32 +91,3 @@ class Cart {
 }
 
 export default Cart;
-
-// import { MongooseAutoIncrementID } from "mongoose-auto-increment-reworked";
-// import Mongoose from "../../db/mongoose";
-
-// import Product from "./product.model";
-
-// const { mongoose } = new Mongoose();
-
-// const CartSchema = new mongoose.Schema({
-//     products: {
-//         type: [Product],
-//         required: true,
-//         unique: true,
-//     },
-//     total: {
-//         type: Number,
-//         required: true,
-//     },
-// });
-
-// // Activate autoIncrementPlugin on Cart's model
-// CartSchema.plugin(MongooseAutoIncrementID.plugin, {
-//     modelName: "Cart",
-// });
-
-// // Create Cart Model
-// const Cart = mongoose.model("Cart", CartSchema);
-
-// export default Cart;
