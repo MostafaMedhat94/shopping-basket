@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { validationResult } from "express-validator/check";
 
 import Product from "../models/Product.model";
+import { cart } from "./cart";
 
 export const getAll = (req: Request, res: Response, next: NextFunction) => {
     Product.find({})
@@ -69,6 +70,9 @@ export const update = (req: Request, res: Response, next: NextFunction) => {
                 });
             }
 
+            // Update the product in the shopping cart (if found)
+            cart.updateProduct(productId, update);
+
             return res.status(200).send(product);
         },
     );
@@ -77,15 +81,18 @@ export const update = (req: Request, res: Response, next: NextFunction) => {
 export const deleteOne = (req: Request, res: Response, next: NextFunction) => {
     const productId = req.params.id;
 
-    Product.findOneAndRemove({ product_id: productId }, (err, doc) => {
+    Product.findOneAndRemove({ product_id: productId }, (err, product) => {
         if (err) return next(err);
 
-        if (!doc) {
+        if (!product) {
             return res.status(404).send({
                 message: "Cannot find any product matching the specified ID",
             });
         }
 
-        return res.status(202).send(doc);
+        // Delete the product from the shopping cart (if found)
+        cart.deleteProduct(product.toObject().product_id);
+
+        return res.status(202).send(product);
     });
 };

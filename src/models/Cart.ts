@@ -37,27 +37,42 @@ class Cart {
         return this._products;
     };
 
-    public updateProductQuantity = (
+    public updateProduct = (
         productId: number,
-        productQuantity: number,
-    ): Promise<string | IProduct> => {
+        update: {
+            product_name?: string;
+            product_price?: number;
+            product_quantity?: number;
+        },
+    ) => {
         const productIndex = this._getProductIndex(productId);
 
-        return new Promise<string | IProduct>((resolve, reject) => {
-            // Check if the product is in the shopping list
-            if (productIndex === -1) {
-                // If, not ...
-                reject("This product is not in your shopping list");
+        // Check if the product is in the shopping list
+        if (productIndex === -1) {
+            // If, not ...
+            return {};
+        }
+
+        // If so, update the product's attributes
+        for (let key in update) {
+            if (key === "product_quantity") {
+                // Check if the product's available quantity
+                // is less than the order quantity
+                if (update[key] < this._products[productIndex][key]) {
+                    // If so, set the order quantity equals the product's available quantity
+                    this._products[productIndex][key] = update[key];
+                }
+                // Otherwise, go to next iteration
+                continue;
             }
+            this._products[productIndex][key] = update[key];
+        }
 
-            // If so, update the product's quantity
-            this._products[productIndex].product_quantity = productQuantity;
+        // Calculate the shopping list's total
+        this._calculateTotal();
 
-            // Calculate the shopping list's total
-            this._calculateTotal();
-
-            resolve(this._products[productIndex]);
-        });
+        // Return the updated product
+        return this._products[productIndex];
     };
 
     public deleteProduct = (productId: number) => {
@@ -87,11 +102,11 @@ class Cart {
             .reduce((accum, current) => accum + current);
     };
 
-    private _isAdded = (productId: number): boolean => {
-        return !!this._products.find(
-            (storedProduct) => storedProduct.product_id === +productId,
-        );
-    };
+    // private _isAdded = (productId: number): boolean => {
+    //     return !!this._products.find(
+    //         (storedProduct) => storedProduct.product_id === +productId,
+    //     );
+    // };
 
     private _getProductIndex = (productId: number): number =>
         this._products.findIndex((product) => product.product_id === productId);

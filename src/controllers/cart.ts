@@ -5,7 +5,7 @@ import Cart from "../models/Cart";
 import Product from "../models/Product.model";
 import IProduct from "../interfaces/IProduct";
 
-const cart = new Cart();
+export const cart = new Cart();
 
 let decrementProductQuantity: (
     next: NextFunction,
