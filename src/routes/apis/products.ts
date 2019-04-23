@@ -1,8 +1,11 @@
 import { Router } from "express";
-import { create } from "../../controllers/products";
+
+import { create, getAll } from "../../controllers/products";
+import { validate } from "../../validators/request";
 
 const router: Router = Router();
 
-router.post("/", create);
+router.get("/", getAll);
+router.post("/", validate("createProduct"), create);
 
 export default router;

@@ -16,9 +16,9 @@ router.get(
 );
 
 // Handle incoming products' requests
-router.use("/products", productsRouter);
+router.use("/api/v1/products", productsRouter);
 
 // Handle incoming shopping cart's requests
-router.use("/cart", cartRouter);
+router.use("/api/v1/cart", cartRouter);
 
 export default router;
