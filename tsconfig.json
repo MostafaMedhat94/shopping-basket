@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "types": ["node", "mocha", "express"],
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "pretty": true,
+        "sourceMap": false,
+        "target": "es6",
+        "allowSyntheticDefaultImports": false,
+        "outDir": "./dist",
+        "rootDir": "."
+    },
+    "include": ["./**/*.ts"],
+    "exclude": [
+        "node_modules",
+        "node_modules",
+        "node_modules/*",
+        "node_modules/@types/node/index.d.ts"
+    ]
+}
