@@ -88,8 +88,6 @@ export const getOne = (req: Request, res: Response, next: NextFunction) => {
     // Get the product (if found)
     const cartProduct = cart.getProduct(productId);
 
-    // DEBUGGER
-    console.log(cartProduct);
     // If the product is not found in the shopping cart
     if (!cartProduct) {
         return res
