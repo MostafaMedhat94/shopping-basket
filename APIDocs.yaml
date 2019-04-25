@@ -19,6 +19,7 @@ paths:
           description: Cart's products and total.
           schema:
             $ref: "#/definitions/Cart"
+            
     post:
       description: Adds new product to cart.
       pramaters:
@@ -69,6 +70,7 @@ paths:
           description: The Product does not exists in the shopping cart.
           schema:
             $ref: "#/definitions/Message"
+
     put:
       summary: Updates a product's quantity
       description: Updates a single product's quantity
@@ -102,6 +104,7 @@ paths:
           description: The Product does not exists in the shopping cart.
           schema:
             $ref: "#/definitions/Message"
+
     delete:
       summary: Deletes a product
       description: Deletes a single product for its unique ID.
@@ -117,6 +120,124 @@ paths:
           schema:
             $ref: "#/definitions/Product"
 
+  /products:
+    get:
+      description: Returns a list of available products
+      responses:
+        200:
+          description: List of available products
+          schema:
+            $ref: "#/definitions/Products"
+
+    post:
+      description: Adds new product to productsList.
+      pramaters:
+        - name: product_id
+          in: body
+          type: number
+          required: true
+          description: The product's ID
+
+        - name: product_name
+          in: body
+          type: string
+          required: true
+          description: The product's name
+
+        - name: product_price
+          in: body
+          type: number
+          required: true
+          description: The product's price
+
+        - name: product_quantity
+          in: body
+          type: number
+          required: true
+          description: The product's quantity
+      responses:
+        201:
+          description: Returns the newly created product.
+          schema:
+            $ref: "#/definitions/Product"
+        422:
+          description: Parameters validation failed.
+          schema:
+            $ref: "#/definitions/Error"
+
+  /products/{id}:
+    get:
+      summary: Gets a product
+      description: Returns a single product for its unique ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: number
+          description: The product's ID
+      responses:
+        200:
+          description: A Product
+          schema:
+            $ref: "#/definitions/Product"
+        404:
+          description: Product not found
+          schema:
+            $ref: "#/definitions/Message"
+
+    put:
+      description: Updates an existing product.
+      pramaters:
+        - name: product_id
+          in: path
+          type: number
+          required: true
+          description: The product's ID
+
+        - name: product_name
+          in: body
+          type: string
+          description: The product's name
+
+        - name: product_price
+          in: body
+          type: number
+          description: The product's price
+
+        - name: product_quantity
+          in: body
+          type: number
+          description: The product's quantity
+
+      responses:
+        200:
+          description: Returns the updated product
+          schema:
+            $ref: "#/definitions/Product"
+        404:
+          description: Product not found
+          schema:
+            $ref: "#/definitions/Message"
+
+    delete:
+      description: Deletes an existing product.
+      pramaters:
+        - name: product_id
+          in: path
+          type: number
+          required: true
+          description: The product's ID
+
+      responses:
+        200:
+          description: Returns the deleted product
+          schema:
+            $ref: "#/definitions/Product"
+        404:
+          description: Product not found
+          schema:
+            $ref: "#/definitions/Message"
+
 
 # ### DEFINITIONS ###
 definitions:
@@ -126,11 +247,14 @@ definitions:
       - total
     properties:
       products:
-        type: array
-        items:
-          $ref: "#/definitions/Product"
+        $ref: "#/definitions/Products"
       total:
         type: number
+
+  Products:
+    type: array
+    items:
+      $ref: "#/definitions/Product"
   
   Product:
     required:
