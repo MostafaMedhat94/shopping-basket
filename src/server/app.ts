@@ -1,3 +1,5 @@
+import * as fs from "fs";
+import * as path from "path";
 import * as express from "express";
 import { Request, Response, NextFunction } from "express";
 import * as bodyParser from "body-parser";
@@ -5,9 +7,20 @@ import * as expressValidator from "express-validator";
 import * as cors from "cors";
 import * as helmet from "helmet";
 import * as morgan from "morgan";
+import * as swaggerUI from "swagger-ui-express";
+import * as yaml from "js-yaml";
+
 import router from "../routes";
 
 const app: express.Application = express();
+
+// Get swagger.yaml config file
+const swaggerDocument = yaml.safeLoad(
+    fs.readFileSync(
+        path.resolve(__dirname + "../../../../APIDocs.yaml"),
+        "utf8",
+    ),
+);
 
 // Securing app requests
 app.use(helmet());
@@ -23,6 +36,9 @@ app.use(morgan("combined"));
 
 // Validate incoming requests
 app.use(expressValidator());
+
+// Generate APIs' Docs UI
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
 // Handle Routing
 app.use(router);

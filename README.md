@@ -18,4 +18,10 @@ yarn: 1.15.2
 ## Usage
 ```bash
 npm run prod
+
+```
+
+```html
+For API's UI Documentation:
+http://localhost:8080/api-docs
 ```
