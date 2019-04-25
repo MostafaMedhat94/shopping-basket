@@ -7,7 +7,7 @@ yarn install
 ```
 
 ## Requirements
-```js
+```yaml
 OS: ubuntu 16.04
 nodejs: 8+
 npm: 6+
