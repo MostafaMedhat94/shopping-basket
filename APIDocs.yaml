@@ -1,0 +1,164 @@
+swagger: "2.0"
+
+info: 
+  version: 1.0.0
+  title: Shopping List App API
+  description: A simple shopping list application to order your gorcery.
+
+schemes:
+  - http
+host: localhost:8080
+basePath: /api/v1
+
+paths:
+  /cart:
+    get:
+      description: Returns the cart details (products and total).
+      responses:
+        200:
+          description: Cart's products and total.
+          schema:
+            $ref: "#/definitions/Cart"
+    post:
+      description: Adds new product to cart.
+      pramaters:
+        - name: product_id
+          in: body
+          type: number
+          required: true
+          description: The product's ID
+        - name: product_quantity
+          in: body
+          type: number
+          required: true
+          description: The product's quantity
+      responses:
+        201:
+          description: Product was added successfully to cart.
+          schema:
+            $ref: "#/definitions/Cart"
+        422:
+          description: Parameters validation failed.
+          schema:
+            $ref: "#/definitions/Error"
+        400:
+          description:
+            Product is not available in the ProductsList. ||
+            Product is out of stock. ||
+            Available quantity is less than order quantity.
+          schema:
+            $ref: "#/definitions/Message"
+            
+
+  /cart/{id}:
+    get:
+      summary: Gets a product
+      description: Returns a single product for its unique ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The product's ID
+          type: number
+      responses:
+        200:
+          description: A Product
+          schema:
+            $ref: "#/definitions/Product"
+        404:
+          description: The Product does not exists in the shopping cart.
+          schema:
+            $ref: "#/definitions/Message"
+    put:
+      summary: Updates a product's quantity
+      description: Updates a single product's quantity
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The product's ID
+          type: number
+        - name: product_quantity
+          in: body
+          type: number
+          required: true
+          description: The product's quantity
+      responses:
+        202:
+          description: Returns the shopping cart after updating a product's quantity.
+          schema:
+            $ref: "#/definitions/Cart"
+        422:
+          description: Parameters validation failed.
+          schema:
+            $ref: "#/definitions/Error"
+        400:
+          description:
+            Product is out of stock. ||
+            Available quantity is less than order quantity.
+          schema:
+            $ref: "#/definitions/Message"
+        404:
+          description: The Product does not exists in the shopping cart.
+          schema:
+            $ref: "#/definitions/Message"
+    delete:
+      summary: Deletes a product
+      description: Deletes a single product for its unique ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The product's ID
+          type: number
+      responses:
+        202:
+          description: Returns the deleted product.
+          schema:
+            $ref: "#/definitions/Product"
+
+
+# ### DEFINITIONS ###
+definitions:
+  Cart:
+    required:
+      - products
+      - total
+    properties:
+      products:
+        type: array
+        items:
+          $ref: "#/definitions/Product"
+      total:
+        type: number
+  
+  Product:
+    required:
+      - product_id
+      - product_name
+      - product_price
+      - product_quantity
+    properties:
+      product_id:
+        type: number
+      product_name:
+        type: string
+      product_price:
+        type: number
+      product_quantity:
+        type: number
+
+  Message:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+
+  Error:
+    required:
+      - error
+    properties:
+      message:
+        type: string
+# ### ### ### ### ### ###

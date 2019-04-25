@@ -91,7 +91,7 @@ export const getOne = (req: Request, res: Response, next: NextFunction) => {
     // If the product is not found in the shopping cart
     if (!cartProduct) {
         return res
-            .status(422)
+            .status(404)
             .send({ message: "The product is not in your shopping cart!" });
     }
 
@@ -127,7 +127,7 @@ export const updateQuantity = (
     // If the product is not found in the shopping cart
     if (!cartProduct) {
         return res
-            .status(422)
+            .status(404)
             .send({ message: "The product is not in your shopping cart!" });
     }
 
@@ -148,13 +148,13 @@ export const updateQuantity = (
 
         // Check if the product is out of stock
         if (storedProductQuantity === 0) {
-            return res.status(422).send({
+            return res.status(400).send({
                 message: "Unfortunately, your product is out of stock!",
             });
         }
         // Check if there's enough quantity to serve the order
         else if (storedProductQuantity < updateQuantity) {
-            return res.status(422).send({
+            return res.status(400).send({
                 message: `There is only ${storedProductQuantity} left of ${product_name}`,
             });
         }
